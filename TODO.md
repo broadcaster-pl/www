@@ -45,6 +45,10 @@ napisz tekst zachęty aby użytkownik, wiedział, że to nie jest zwykłe pole w
 aby użytkownik, nie musiał pisać, jeśli tylko kliknie na pole szukaj/chat-a 
 
 
+strona nie jest scrollowalna, dlaczego ? dolna część: footer strony jest stala na dole, ale zakrrywa treść, powinien przesuwał się w dół i pojawiac isę scrollbar 
+treść powinna pojawiac się po zawartosci chata a nie pod menu, ponieważ chat przykrywa treść 
+
+
 
 
 Panel klienta powinien być dostepny po zalogowaniu

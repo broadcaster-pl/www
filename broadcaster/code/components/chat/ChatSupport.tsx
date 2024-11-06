@@ -1,34 +1,42 @@
 import React, { useRef, useState } from 'react';
-import { YStack, GetRef, Input, ScrollView } from 'tamagui';
+import { YStack, GetRef, Input, ScrollView, Text, XStack } from 'tamagui';
 import { ClientOnly } from '../ClientOnly';
 import { searchService } from '../../services/SearchService';
-import { ChatContent } from './ChatContent';
+import { chatService } from '../../services/ChatService';
 import { ChatMessage } from './types';
-import { useChatFocus, useChatScroll, useClickOutside } from './hooks';
+import { useChatFocus, useChatScroll } from './hooks';
+
+const QUICK_ACTIONS = [
+    { id: 1, text: "Zostaw numer telefonu do kontaktu" },
+    { id: 2, text: "Zaloguj/Zarejestruj się przez email" },
+    { id: 3, text: "Jak rozpocząć streaming?" },
+    { id: 4, text: "Cennik usług" },
+    { id: 5, text: "Pomoc techniczna" },
+    { id: 6, text: "Status serwerów" }
+];
+
+const WELCOME_MESSAGE: ChatMessage = {
+    id: 0,
+    type: 'agent',
+    content: 'Witaj! Jestem tutaj, aby Ci pomóc. Możesz:\n' +
+        '• Zostawić numer telefonu, a my oddzwonimy\n' +
+        '• Podać email do szybkiej rejestracji/logowania\n' +
+        '• Zadać pytanie o streaming lub naszą platformę\n' +
+        '• Uzyskać natychmiastową pomoc techniczną',
+    time: ''
+};
 
 const ChatSupportContent: React.FC = (): JSX.Element => {
-    const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [messages, setMessages] = useState<ChatMessage[]>([WELCOME_MESSAGE]);
     const [inputValue, setInputValue] = useState('');
-    const [isExpanded, setIsExpanded] = useState(true);
-    const [isInitialLoad, setIsInitialLoad] = useState(true);
-    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [suggestions, setSuggestions] = useState<string[]>([]);
+    const [awaitingVerification, setAwaitingVerification] = useState(false);
+    const [verificationEmail, setVerificationEmail] = useState('');
     const inputRef = useRef<GetRef<typeof Input>>(null);
     const scrollViewRef = useRef<GetRef<typeof ScrollView>>(null);
-    const chatContainerRef = useRef<GetRef<typeof YStack>>(null);
 
     const { focusInput } = useChatFocus(inputRef);
     const { scrollToBottom } = useChatScroll(scrollViewRef);
-
-    useClickOutside(chatContainerRef, () => {
-        setIsExpanded(false);
-    });
-
-    React.useEffect(() => {
-        if (isInitialLoad) {
-            setIsInitialLoad(false);
-            setIsExpanded(false);
-        }
-    }, [isInitialLoad]);
 
     React.useEffect(() => {
         if (messages.length > 0) {
@@ -37,56 +45,20 @@ const ChatSupportContent: React.FC = (): JSX.Element => {
     }, [messages]);
 
     React.useEffect(() => {
-        if (isExpanded && messages.length > 0) {
-            scrollToBottom();
-        }
-        if (isExpanded) {
-            focusInput();
-        }
-    }, [isExpanded]);
-
-    React.useEffect(() => {
-        const handleKeyPress = (e: KeyboardEvent) => {
-            if (e.key === 'Enter' && !e.shiftKey && document.activeElement !== inputRef.current) {
-                e.preventDefault();
-                focusInput();
-            }
-        };
-
-        window.addEventListener('keypress', handleKeyPress);
-        return () => window.removeEventListener('keypress', handleKeyPress);
-    }, []);
-
-    React.useEffect(() => {
-        const fetchResults = async () => {
+        const updateSuggestions = async () => {
             if (inputValue.trim()) {
-                const results = await searchService.search(inputValue);
-                setSearchResults(results);
+                const newSuggestions = await chatService.getContextualSuggestions(inputValue);
+                setSuggestions(newSuggestions);
             } else {
-                setSearchResults([]);
+                setSuggestions([]);
             }
         };
 
-        fetchResults();
+        updateSuggestions();
     }, [inputValue]);
-
-    const handleInputFocus = (e?: any) => {
-        e?.preventDefault();
-        if (!isExpanded) {
-            setIsExpanded(true);
-        }
-        if (messages.length > 0) {
-            scrollToBottom();
-        }
-        focusInput();
-    };
 
     const handleInputChange = (value: string) => {
         setInputValue(value);
-        if (!isExpanded && value.length > 0) {
-            setIsExpanded(true);
-            focusInput();
-        }
     };
 
     const handleKeyPress = (e: any) => {
@@ -96,7 +68,60 @@ const ChatSupportContent: React.FC = (): JSX.Element => {
         }
     };
 
-    const sendMessage = () => {
+    const handleQuickAction = (text: string) => {
+        setInputValue(text);
+        focusInput();
+    };
+
+    const processMessage = async (content: string): Promise<{ type: 'agent', content: string }> => {
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (emailRegex.test(content)) {
+            const response = await chatService.processEmail(content);
+            setAwaitingVerification(true);
+            setVerificationEmail(content);
+            return {
+                type: 'agent',
+                content: response
+            };
+        }
+
+        // Verification code handling
+        if (awaitingVerification && content.length === 6) {
+            const isValid = await chatService.verifyCode(content, verificationEmail);
+            setAwaitingVerification(false);
+            setVerificationEmail('');
+            return {
+                type: 'agent',
+                content: isValid 
+                    ? 'Kod weryfikacyjny poprawny. Zostałeś pomyślnie zalogowany.'
+                    : 'Nieprawidłowy kod weryfikacyjny. Spróbuj ponownie lub poproś o nowy kod.'
+            };
+        }
+
+        // Phone number validation
+        const phoneRegex = /^[0-9]{9}$/;
+        if (phoneRegex.test(content.replace(/\s/g, ''))) {
+            const response = await chatService.processPhone(content);
+            return {
+                type: 'agent',
+                content: response
+            };
+        }
+
+        // Default response with suggestions
+        const suggestions = await chatService.getQuickResponses();
+        return {
+            type: 'agent',
+            content: 'Jak mogę Ci pomóc? Możesz:\n' +
+                '• Podać email do rejestracji/logowania\n' +
+                '• Zostawić numer telefonu do kontaktu\n' +
+                '• Lub zapytać o:\n' +
+                suggestions.map(s => `  - ${s}`).join('\n')
+        };
+    };
+
+    const sendMessage = async () => {
         if (inputValue.trim()) {
             const newMessage: ChatMessage = {
                 id: messages.length + 1,
@@ -112,11 +137,14 @@ const ChatSupportContent: React.FC = (): JSX.Element => {
             setInputValue('');
             focusInput();
 
+            // Process the message and get response
+            const response = await processMessage(newMessage.content);
+            
             setTimeout(() => {
                 const responseMessage: ChatMessage = {
                     id: messages.length + 2,
-                    type: 'agent',
-                    content: 'Dziękuję za wiadomość. Jak mogę pomóc?',
+                    type: response.type,
+                    content: response.content,
                     time: new Date().toLocaleTimeString('pl-PL', { 
                         hour: '2-digit', 
                         minute: '2-digit' 
@@ -128,48 +156,132 @@ const ChatSupportContent: React.FC = (): JSX.Element => {
         }
     };
 
-    const handleSearchResultClick = (title: string) => {
-        setInputValue(title);
-        focusInput();
-    };
-
     return (
-        <>
-            <div style={{
+        <YStack
+            position="absolute"
+            top={60}
+            left={0}
+            right={0}
+            height="20vh"
+            zIndex={1000}
+            backgroundColor="$background"
+            borderBottomWidth={1}
+            borderBottomColor="$borderColor"
+            style={{
                 position: 'fixed',
-                top: 60,
-                left: 0,
-                right: 0,
-                zIndex: 1000
-            }}>
-                <YStack
-                    ref={chatContainerRef}
-                    animation="quick"
-                    width="100%"
-                    height={isExpanded ? "60vh" : 50}
-                    onPress={(e) => {
-                        e.stopPropagation();
-                        focusInput();
-                    }}
-                >
-                    <ChatContent
-                        isExpanded={isExpanded}
-                        inputRef={inputRef}
-                        scrollViewRef={scrollViewRef}
-                        inputValue={inputValue}
-                        messages={messages}
-                        searchResults={searchResults}
-                        onInputChange={handleInputChange}
-                        onInputFocus={handleInputFocus}
-                        onKeyPress={handleKeyPress}
-                        onSend={sendMessage}
-                        onSearchResultClick={handleSearchResultClick}
-                    />
+                top: '60px',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+            } as any}
+        >
+            <ScrollView
+                f={1}
+                p="$4"
+                ref={scrollViewRef}
+                showsVerticalScrollIndicator={true}
+                bounces={false}
+            >
+                <YStack space="$4" pb="$4">
+                    {messages.map((message) => (
+                        <XStack
+                            key={message.id}
+                            jc={message.type === 'user' ? 'flex-end' : 'flex-start'}
+                        >
+                            <YStack
+                                maxWidth="80%"
+                                p="$3"
+                                br="$4"
+                                bg={message.type === 'user' ? '$blue10' : '$gray2'}
+                            >
+                                <Text 
+                                    color={message.type === 'user' ? 'white' : '$color'}
+                                    whiteSpace="pre-line"
+                                >
+                                    {message.content}
+                                </Text>
+                                {message.time && (
+                                    <Text
+                                        fontSize="$1"
+                                        color={message.type === 'user' ? 'white' : '$gray11'}
+                                        o={0.7}
+                                        mt="$1"
+                                    >
+                                        {message.time}
+                                    </Text>
+                                )}
+                            </YStack>
+                        </XStack>
+                    ))}
                 </YStack>
-            </div>
-            {/* Spacer to prevent content overlap */}
-            <YStack height={isExpanded ? "calc(60vh + 60px)" : 110} />
-        </>
+
+                {inputValue === '' && (
+                    <YStack space="$2" mt="$4">
+                        <Text color="$gray11" fontSize="$3">Popularne zapytania:</Text>
+                        <XStack flexWrap="wrap" gap="$2">
+                            {QUICK_ACTIONS.map((action) => (
+                                <YStack
+                                    key={action.id}
+                                    backgroundColor="$gray2"
+                                    paddingHorizontal="$3"
+                                    paddingVertical="$2"
+                                    borderRadius="$4"
+                                    pressStyle={{ bg: '$gray3' }}
+                                    cursor="pointer"
+                                    onPress={() => handleQuickAction(action.text)}
+                                >
+                                    <Text fontSize="$2">{action.text}</Text>
+                                </YStack>
+                            ))}
+                        </XStack>
+                    </YStack>
+                )}
+
+                {suggestions.length > 0 && inputValue && (
+                    <YStack space="$2" mt="$4">
+                        <Text color="$gray11" fontSize="$3">Sugestie:</Text>
+                        <YStack space="$1">
+                            {suggestions.map((suggestion, index) => (
+                                <YStack
+                                    key={index}
+                                    backgroundColor="$gray2"
+                                    paddingHorizontal="$3"
+                                    paddingVertical="$2"
+                                    borderRadius="$4"
+                                    pressStyle={{ bg: '$gray3' }}
+                                    cursor="pointer"
+                                    onPress={() => handleQuickAction(suggestion)}
+                                >
+                                    <Text fontSize="$2">{suggestion}</Text>
+                                </YStack>
+                            ))}
+                        </YStack>
+                    </YStack>
+                )}
+            </ScrollView>
+
+            <XStack
+                p="$3"
+                ai="center"
+                jc="space-between"
+                bg="$color10"
+                borderTopLeftRadius="$4"
+                borderTopRightRadius="$4"
+            >
+                <Input
+                    ref={inputRef}
+                    f={1}
+                    size="$4"
+                    value={inputValue}
+                    onChangeText={handleInputChange}
+                    placeholder={awaitingVerification ? "Wprowadź kod weryfikacyjny..." : "Szukaj lub zadaj pytanie..."}
+                    onKeyPress={handleKeyPress}
+                    borderWidth={0}
+                    bg="transparent"
+                    color="white"
+                    returnKeyType="send"
+                    placeholderTextColor="rgba(255, 255, 255, 0.7)"
+                />
+            </XStack>
+        </YStack>
     );
 };
 
