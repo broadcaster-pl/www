@@ -5,8 +5,6 @@ import { ChatContainer, ChatPanel, ChatMessage } from './StyledComponents';
 import { ClientOnly } from './ClientOnly';
 import { searchService } from '../services/SearchService';
 
-const MINIMIZE_DELAY = 15000; // 15 seconds
-
 const ChatSupportContent: React.FC = (): JSX.Element => {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [inputValue, setInputValue] = useState('');
@@ -15,9 +13,14 @@ const ChatSupportContent: React.FC = (): JSX.Element => {
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const inputRef = useRef<GetRef<typeof Input>>(null);
     const scrollViewRef = useRef<GetRef<typeof ScrollView>>(null);
-    const minimizeTimerRef = useRef<NodeJS.Timeout | null>(null);
     const chatContainerRef = useRef<GetRef<typeof YStack>>(null);
     const [isDocked, setIsDocked] = useState(false);
+
+    const focusInput = () => {
+        setTimeout(() => {
+            inputRef.current?.focus();
+        }, 0);
+    };
 
     const scrollToBottom = () => {
         setTimeout(() => {
@@ -25,7 +28,7 @@ const ChatSupportContent: React.FC = (): JSX.Element => {
                 const scrollView = scrollViewRef.current as any;
                 scrollView.scrollToEnd?.({ animated: true });
             }
-        }, 100); // Small delay to ensure content is rendered
+        }, 100);
     };
 
     // Handle clicks outside chat
@@ -44,46 +47,34 @@ const ChatSupportContent: React.FC = (): JSX.Element => {
         };
     }, []);
 
-    // Scroll to bottom whenever messages change
     useEffect(() => {
         if (messages.length > 0) {
             scrollToBottom();
         }
     }, [messages]);
 
-    // Scroll to bottom when chat expands
     useEffect(() => {
         if (isExpanded && messages.length > 0) {
             scrollToBottom();
         }
+        if (isExpanded) {
+            focusInput();
+        }
     }, [isExpanded]);
-
-    const resetMinimizeTimer = () => {
-        if (minimizeTimerRef.current) {
-            clearTimeout(minimizeTimerRef.current);
-        }
-        if (inputValue.length === 0) {
-            minimizeTimerRef.current = setTimeout(() => {
-                setIsExpanded(false);
-                setIsDocked(true);
-            }, MINIMIZE_DELAY);
-        }
-    };
 
     useEffect(() => {
         if (isInitialLoad) {
             setIsInitialLoad(false);
-            setTimeout(() => {
-                setIsDocked(true);
-                setIsExpanded(false);
-            }, MINIMIZE_DELAY);
+            setIsDocked(true);
+            setIsExpanded(false);
         }
     }, [isInitialLoad]);
 
     useEffect(() => {
         const handleKeyPress = (e: KeyboardEvent) => {
             if (e.key === 'Enter' && !e.shiftKey && document.activeElement !== inputRef.current) {
-                inputRef.current?.focus();
+                e.preventDefault();
+                focusInput();
             }
         };
 
@@ -104,22 +95,32 @@ const ChatSupportContent: React.FC = (): JSX.Element => {
         fetchResults();
     }, [inputValue]);
 
-    const handleInputFocus = () => {
-        setIsExpanded(true);
-        setIsDocked(false);
-        resetMinimizeTimer();
+    const handleInputFocus = (e?: any) => {
+        e?.preventDefault();
+        if (!isExpanded) {
+            setIsExpanded(true);
+            setIsDocked(false);
+        }
         if (messages.length > 0) {
             scrollToBottom();
         }
+        focusInput();
     };
 
     const handleInputChange = (value: string) => {
         setInputValue(value);
-        if (value.length > 0) {
+        if (!isExpanded && value.length > 0) {
             setIsExpanded(true);
             setIsDocked(false);
+            focusInput();
         }
-        resetMinimizeTimer();
+    };
+
+    const handleKeyPress = (e: any) => {
+        if (e.nativeEvent?.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
     };
 
     const sendMessage = () => {
@@ -136,14 +137,8 @@ const ChatSupportContent: React.FC = (): JSX.Element => {
 
             setMessages(prev => [...prev, newMessage]);
             setInputValue('');
-            resetMinimizeTimer();
-            
-            // Focus back on input after sending
-            setTimeout(() => {
-                inputRef.current?.focus();
-            }, 0);
+            focusInput();
 
-            // Simulate response
             setTimeout(() => {
                 const responseMessage: ChatMessage = {
                     id: messages.length + 2,
@@ -155,43 +150,50 @@ const ChatSupportContent: React.FC = (): JSX.Element => {
                     })
                 };
                 setMessages(prev => [...prev, responseMessage]);
-                // Ensure input stays focused after response
-                inputRef.current?.focus();
+                focusInput();
             }, 1000);
         }
     };
 
-    return (
+    const handleSearchResultClick = (title: string) => {
+        setInputValue(title);
+        focusInput();
+    };
+
+    const InputContainer = ({ children }: { children: React.ReactNode }) => (
+        <XStack
+            p="$3"
+            ai="center"
+            jc="space-between"
+            bg="$color10"
+            br="$4"
+            shadowColor="$shadowColor"
+            shadowRadius={20}
+            shadowOffset={{ width: 0, height: 10 }}
+            shadowOpacity={0.2}
+            width="100%"
+            onPress={(e) => {
+                e.preventDefault();
+                handleInputFocus();
+            }}
+        >
+            {children}
+        </XStack>
+    );
+
+    const ChatContent = () => (
         <YStack
             ref={chatContainerRef}
             animation="quick"
-            position="absolute"
-            {...(isDocked ? {
-                top: 0,
-                left: "50%",
-                transform: [{ translateX: '-50%' }]
-            } : {
-                top: "50%",
-                left: "50%",
-                transform: [{ translateX: '-50%' }, { translateY: '-50%' }]
-            })}
-            width={isExpanded ? 600 : 400}
-            height={isExpanded ? 500 : 50}
-            scale={isExpanded ? 1 : 0.8}
-            zIndex={1000}
+            width="100%"
+            height={isExpanded ? "60vh" : 50}
+            onPress={(e) => {
+                e.stopPropagation();
+                focusInput();
+            }}
         >
             {!isExpanded ? (
-                <XStack
-                    p="$2"
-                    ai="center"
-                    jc="space-between"
-                    bg="$background"
-                    br="$4"
-                    shadowColor="$shadowColor"
-                    shadowRadius={20}
-                    shadowOffset={{ width: 0, height: 10 }}
-                    shadowOpacity={0.2}
-                >
+                <InputContainer>
                     <Input
                         ref={inputRef}
                         f={1}
@@ -200,21 +202,22 @@ const ChatSupportContent: React.FC = (): JSX.Element => {
                         onChangeText={handleInputChange}
                         placeholder="Szukaj lub rozpocznij czat..."
                         onFocus={handleInputFocus}
+                        onKeyPress={handleKeyPress}
                         borderWidth={0}
                         bg="transparent"
-                        color="$color"
-                        onSubmitEditing={sendMessage}
+                        color="white"
                         returnKeyType="send"
+                        placeholderTextColor="rgba(255, 255, 255, 0.7)"
                     />
                     <Button
                         size="$3"
                         chromeless
-                        icon={<Search size="$1" />}
+                        icon={<Search size="$1" color="white" />}
                         onPress={handleInputFocus}
                     />
-                </XStack>
+                </InputContainer>
             ) : (
-                <YStack f={1} bg="$background" br="$4" ov="hidden">
+                <YStack f={1} bg="$background" ov="hidden" br="$4">
                     {searchResults.length > 0 && inputValue && !messages.length ? (
                         <ScrollView f={1} p="$4">
                             <YStack space="$2">
@@ -225,7 +228,7 @@ const ChatSupportContent: React.FC = (): JSX.Element => {
                                         br="$2"
                                         bg="$gray2"
                                         pressStyle={{ bg: '$gray3' }}
-                                        onPress={() => setInputValue(result.title)}
+                                        onPress={() => handleSearchResultClick(result.title)}
                                     >
                                         <YStack f={1}>
                                             <Text fontWeight="bold">{result.title}</Text>
@@ -275,14 +278,7 @@ const ChatSupportContent: React.FC = (): JSX.Element => {
                                     ))}
                                 </YStack>
                             </ScrollView>
-                            <XStack
-                                p="$2"
-                                ai="center"
-                                jc="space-between"
-                                bg="$color10"
-                                borderTopLeftRadius="$4"
-                                borderTopRightRadius="$4"
-                            >
+                            <InputContainer>
                                 <Input
                                     ref={inputRef}
                                     f={1}
@@ -291,11 +287,12 @@ const ChatSupportContent: React.FC = (): JSX.Element => {
                                     onChangeText={handleInputChange}
                                     placeholder="Napisz wiadomość..."
                                     onFocus={handleInputFocus}
+                                    onKeyPress={handleKeyPress}
                                     borderWidth={0}
                                     bg="transparent"
                                     color="white"
-                                    onSubmitEditing={sendMessage}
                                     returnKeyType="send"
+                                    placeholderTextColor="rgba(255, 255, 255, 0.7)"
                                 />
                                 <Button
                                     size="$3"
@@ -304,12 +301,28 @@ const ChatSupportContent: React.FC = (): JSX.Element => {
                                     onPress={sendMessage}
                                     disabled={!inputValue.trim()}
                                 />
-                            </XStack>
+                            </InputContainer>
                         </YStack>
                     )}
                 </YStack>
             )}
         </YStack>
+    );
+
+    return (
+        <>
+            <div style={{
+                position: 'fixed',
+                top: 60,
+                left: 0,
+                right: 0,
+                zIndex: 1000
+            }}>
+                <ChatContent />
+            </div>
+            {/* Spacer to prevent content overlap */}
+            <YStack height={isExpanded ? "calc(60vh + 60px)" : 110} />
+        </>
     );
 };
 

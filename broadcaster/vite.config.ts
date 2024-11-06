@@ -6,7 +6,7 @@ export default {
   plugins: [
     one({
       web: {
-        defaultRenderMode: 'spa',
+        defaultRenderMode: 'ssg',
       },
 
       app: {

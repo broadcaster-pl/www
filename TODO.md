@@ -19,6 +19,26 @@ przy kliknięciu w chat powinnien zescrolować wiadomośći do najnowszej
 
 wyłacz chowanie chatu po czasie (15 sekundach)
 
+przy kliknięciu w zminimalizowany chat, kursor powinien pojawić się w polu wpisywania wiadomości
+
+Chat powinien znajdowac się na całej długości poniżej głównego menu na gorze
+
+Wysokośc chat powinna być 60% a nie 100%
+
+zmien wygląd pola chatu, powinno być bardziej wyraziste i takie samo na gorze w zminimalizowanej formie i w momencie aktywnosci
+
+po wpisaniu pierwszej litery kursor wychodzi z pola i tekst pojawia sie w opolu wyszikwania przegląrki firefox ale powinien pozostac w polu chat
+
+każde naciśnięcie przycisku powinno automatycznie pokazać kursor w polu chat 
+
+przesun tresc strony z tytułem ponizej chat, aktualnie tytuły stron są zasłonięte przez pole chat na górze
+
+zrob refaktoryzacje chat i podziel na kilka plikow
+
+zoptymalizuj chat, dodaj go jako stałą część strony na dole pod menu, aby zajmował 30 procent strony od góry a następnie zaczynała się tresć strony
+w przypadku scrolowania powinien dać sie zescrolować jak zwyczajne pole szukaj
+
+
 napisz tekst zachęty aby użytkownik, wiedział, że to nie jest zwykłe pole wysuzkiwania, ale też chatbot, który odpowiada, oraz pisze, np, 
 - zostaw swój numer telefonu, oddzwonimy,
 - podaj swój email, wyślemy email z kodem do logowania/rejestracji (jeśli email nie istnieje) stworz backend do tego
