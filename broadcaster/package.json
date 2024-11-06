@@ -18,19 +18,15 @@
     "hoistingLimits": "workspaces"
   },
   "dependencies": {
-    "@radix-ui/react-slot": "^1.1.0",
     "@react-native-masked-view/masked-view": "^0.3.1",
-    "@tamagui/animations-moti": "^1.116.7",
-    "@tamagui/colors": "^1.116.7",
-    "@tamagui/image-next": "^1.116.7",
+    "@tamagui/animations-moti": "^1.116.12",
+    "@tamagui/colors": "^1.116.12",
+    "@tamagui/image-next": "^1.116.12",
     "@tamagui/lucide-icons": "^1.116.12",
-    "@tamagui/react-native-media-driver": "^1.116.7",
+    "@tamagui/react-native-media-driver": "^1.116.12",
     "@vxrn/color-scheme": "1.1.328",
-    "class-variance-authority": "^0.7.0",
-    "clsx": "^2.1.1",
     "expo": "~51.0.28",
     "expo-modules-core": "^1.12.24",
-    "lucide-react": "^0.454.0",
     "one": "1.1.328",
     "react": "^18.3.1",
     "react-native": "0.74.5",
@@ -39,12 +35,11 @@
     "react-native-screens": "3.31.1",
     "react-native-svg": "15.2.0",
     "react-native-web": "^0.19.12",
-    "tailwind-merge": "^2.5.4",
-    "tamagui": "^1.116.7"
+    "tamagui": "^1.116.12"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.3",
-    "@tamagui/vite-plugin": "^1.116.7",
+    "@tamagui/vite-plugin": "^1.116.12",
     "@types/react": "^18.3.11",
     "vite": "6.0.0-beta.1"
   }
