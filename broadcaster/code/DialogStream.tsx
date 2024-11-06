@@ -2,8 +2,44 @@ import React, { useState } from 'react';
 import { YStack, XStack, Text, Button, Card, Stack, Input, Select, TextArea, Sheet } from 'tamagui';
 import { Check, Zap, Shield, Cloud, Video, Share2, Star, Fingerprint, Box, Tv, Menu, X } from '@tamagui/lucide-icons';
 
+interface NavItem {
+    name: string;
+    key: string;
+}
+
+interface FooterSection {
+    title: string;
+    items: Array<{
+        name: string;
+        key: string;
+    }>;
+}
+
+interface FeaturesProps {
+    setCurrentPage: (page: string) => void;
+}
+
+interface FAQ {
+    question: string;
+    answer: string;
+}
+
+interface BlogPost {
+    title: string;
+    excerpt: string;
+    author: string;
+    date: string;
+    readTime: string;
+}
+
+interface Service {
+    name: string;
+    status: string;
+    uptime: string;
+}
+
 // Features Component
-const Features = () => (
+const Features: React.FC<FeaturesProps> = ({ setCurrentPage }) => (
     <YStack f={1} pt="$8">
         <YStack ai="center" p="$4" space="$4">
             <Text fontSize="$8" fontWeight="bold">Funkcje platformy</Text>
@@ -77,7 +113,7 @@ const Features = () => (
 );
 
 // Contact Component
-const Contact = () => (
+const Contact: React.FC = () => (
     <YStack f={1} pt="$8">
         <YStack ai="center" p="$4" space="$4">
             <Text fontSize="$8" fontWeight="bold">Kontakt</Text>
@@ -122,8 +158,8 @@ const Contact = () => (
 );
 
 // FAQ Component
-const FAQ = () => {
-    const faqs = [
+const FAQ: React.FC = () => {
+    const faqs: FAQ[] = [
         {
             question: "Jak rozpocząć korzystanie z DialogStream?",
             answer: "Rozpoczęcie jest proste - wystarczy zarejestrować się i wybrać plan za 1 PLN na 7 dni. Otrzymasz pełny dostęp do wszystkich funkcji Pro."
@@ -162,8 +198,8 @@ const FAQ = () => {
 };
 
 // Blog Component
-const Blog = () => {
-    const posts = [
+const Blog: React.FC = () => {
+    const posts: BlogPost[] = [
         {
             title: "Jak zoptymalizować streaming pod SEO?",
             excerpt: "Poznaj najlepsze praktyki optymalizacji contentu streamingowego pod kątem wyszukiwarek.",
@@ -212,8 +248,8 @@ const Blog = () => {
 };
 
 // Status Component
-const Status = () => {
-    const services = [
+const Status: React.FC = () => {
+    const services: Service[] = [
         {
             name: "Streaming API",
             status: "operational",
@@ -269,7 +305,7 @@ export function DialogStream() {
     const [currentPage, setCurrentPage] = useState('home');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    const navItems = [
+    const navItems: NavItem[] = [
         { name: 'Strona główna', key: 'home' },
         { name: 'Funkcje', key: 'features' },
         { name: 'Cennik', key: 'pricing' },
@@ -279,10 +315,37 @@ export function DialogStream() {
         { name: 'Kontakt', key: 'contact' }
     ];
 
+    const footerSections: FooterSection[] = [
+        {
+            title: "Produkt",
+            items: [
+                { name: "Funkcje", key: "features" },
+                { name: "Cennik", key: "pricing" },
+                { name: "FAQ", key: "faq" }
+            ]
+        },
+        {
+            title: "Wsparcie",
+            items: [
+                { name: "Dokumentacja", key: "docs" },
+                { name: "Kontakt", key: "contact" },
+                { name: "Status", key: "status" }
+            ]
+        },
+        {
+            title: "Firma",
+            items: [
+                { name: "O nas", key: "about" },
+                { name: "Blog", key: "blog" },
+                { name: "Kariera", key: "careers" }
+            ]
+        }
+    ];
+
     const renderPage = () => {
         switch(currentPage) {
             case 'features':
-                return <Features />;
+                return <Features setCurrentPage={setCurrentPage} />;
             case 'contact':
                 return <Contact />;
             case 'faq':
@@ -453,32 +516,7 @@ export function DialogStream() {
                         <Text fontWeight="bold">DialogStream</Text>
                         <Text color="$gray10">Profesjonalne rozwiązanie dla twórców contentu</Text>
                     </YStack>
-                    {[
-                        {
-                            title: "Produkt",
-                            items: [
-                                { name: "Funkcje", key: "features" },
-                                { name: "Cennik", key: "pricing" },
-                                { name: "FAQ", key: "faq" }
-                            ]
-                        },
-                        {
-                            title: "Wsparcie",
-                            items: [
-                                { name: "Dokumentacja", key: "docs" },
-                                { name: "Kontakt", key: "contact" },
-                                { name: "Status", key: "status" }
-                            ]
-                        },
-                        {
-                            title: "Firma",
-                            items: [
-                                { name: "O nas", key: "about" },
-                                { name: "Blog", key: "blog" },
-                                { name: "Kariera", key: "careers" }
-                            ]
-                        }
-                    ].map((section, index) => (
+                    {footerSections.map((section, index) => (
                         <YStack key={index} space="$2" w={150}>
                             <Text fontWeight="bold">{section.title}</Text>
                             {section.items.map((item, itemIndex) => (
