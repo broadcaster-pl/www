@@ -2,8 +2,6 @@
     "navItems": [
         { "name": "Funkcje", "key": "features" },
         { "name": "Cennik", "key": "pricing" },
-        { "name": "Panel klienta", "key": "client" },
-        { "name": "API", "key": "api" },
         { "name": "FAQ", "key": "faq" },
         { "name": "Blog", "key": "blog" }
     ],
@@ -19,8 +17,9 @@
         {
             "title": "Wsparcie",
             "items": [
+                { "name": "Panel klienta", "key": "client" },
                 { "name": "Dokumentacja", "key": "docs" },
-                { "name": "Kontakt", "key": "contact" },
+                { "name": "API", "key": "api" },
                 { "name": "Status", "key": "status" }
             ]
         },
@@ -28,6 +27,7 @@
             "title": "Firma",
             "items": [
                 { "name": "O nas", "key": "about" },
+                { "name": "Kontakt", "key": "contact" },
                 { "name": "Blog", "key": "blog" },
                 { "name": "Kariera", "key": "careers" }
             ]

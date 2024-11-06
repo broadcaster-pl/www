@@ -5,3 +5,7 @@ export * from './Features';
 export * from './PaymentSystem';
 export * from './Status';
 export * from './StyledComponents';
+export * from './NotificationSystem';
+export * from './AdvancedAnalytics';
+export * from './ChatSupport';
+export * from './Integrations';

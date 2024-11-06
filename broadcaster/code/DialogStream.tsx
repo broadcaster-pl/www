@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { YStack, XStack, Text, Button, Card, Sheet } from 'tamagui';
-import { Menu } from '@tamagui/lucide-icons';
+import { YStack, XStack, Text, Button, Sheet, Theme } from 'tamagui';
+import { Menu, Bell } from '@tamagui/lucide-icons';
 import {
     ApiDocumentation,
     Blog,
@@ -8,6 +8,10 @@ import {
     Features,
     PaymentSystem,
     Status,
+    NotificationSystem,
+    AdvancedAnalytics,
+    ChatSupport,
+    Integrations,
     NavItem
 } from './components';
 import navigationData from '../data/navigation.json';
@@ -15,6 +19,8 @@ import navigationData from '../data/navigation.json';
 export function DialogStream(): JSX.Element {
     const [currentPage, setCurrentPage] = useState('home');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+    const [isChatOpen, setIsChatOpen] = useState(false);
 
     const renderPage = (): JSX.Element => {
         switch(currentPage) {
@@ -30,6 +36,10 @@ export function DialogStream(): JSX.Element {
                 return <Status />;
             case 'payment':
                 return <PaymentSystem />;
+            case 'analytics':
+                return <AdvancedAnalytics />;
+            case 'integrations':
+                return <Integrations />;
             default:
                 return (
                     <YStack f={1} pt="$8">
@@ -108,6 +118,10 @@ export function DialogStream(): JSX.Element {
                             {item.name}
                         </Button>
                     ))}
+                    <Button
+                        onPress={() => setIsNotificationsOpen(true)}
+                        icon={<Bell size="$1" />}
+                    />
                     <Button 
                         theme="yellow"
                         onPress={() => setCurrentPage('payment')}
@@ -217,6 +231,27 @@ export function DialogStream(): JSX.Element {
                     Rozpocznij za 1 PLN
                 </Button>
             </XStack>
+
+            {/* Notifications Panel */}
+            <NotificationSystem 
+                isOpen={isNotificationsOpen} 
+                setIsOpen={setIsNotificationsOpen} 
+            />
+
+            {/* Chat Support */}
+            {isChatOpen && <ChatSupport />}
+
+            {/* Chat Support Toggle */}
+            <Button
+                position="absolute"
+                bottom="$4"
+                right="$4"
+                size="$4"
+                theme="yellow"
+                onPress={() => setIsChatOpen(!isChatOpen)}
+            >
+                {isChatOpen ? 'Zamknij czat' : 'Wsparcie'}
+            </Button>
         </YStack>
     );
 };
