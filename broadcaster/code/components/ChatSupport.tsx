@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { YStack, XStack, Text, Button, Input, Theme, ScrollView, GetRef } from 'tamagui';
 import { X, Send } from '@tamagui/lucide-icons';
 import { ChatPanel, ChatHeader, ChatInput, ChatMessage } from './StyledComponents';
+import { ClientOnly } from './ClientOnly';
 
 const initialMessages: ChatMessage[] = [
     {
@@ -24,7 +25,7 @@ const initialMessages: ChatMessage[] = [
     }
 ];
 
-export const ChatSupport: React.FC = (): JSX.Element => {
+const ChatSupportContent: React.FC = (): JSX.Element => {
     const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
     const [newMessage, setNewMessage] = useState('');
     const [isOpen, setIsOpen] = useState(true);
@@ -167,5 +168,13 @@ export const ChatSupport: React.FC = (): JSX.Element => {
                 </XStack>
             </ChatInput>
         </ChatPanel>
+    );
+};
+
+export const ChatSupport: React.FC = () => {
+    return (
+        <ClientOnly>
+            <ChatSupportContent />
+        </ClientOnly>
     );
 };

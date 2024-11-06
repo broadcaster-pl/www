@@ -9,3 +9,4 @@ export * from './NotificationSystem';
 export * from './AdvancedAnalytics';
 export * from './ChatSupport';
 export * from './Integrations';
+export * from './ClientOnly';

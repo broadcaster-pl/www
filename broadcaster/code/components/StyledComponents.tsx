@@ -1,4 +1,4 @@
-import { styled, YStack, XStack, Text, GetProps } from 'tamagui';
+import { styled, YStack, Text, XStack, GetProps } from 'tamagui';
 
 // Styled components
 export const CodeBlock = styled(YStack, {
@@ -20,6 +20,64 @@ export const CardTitle = styled(Text, {
 
 export const CardDescription = styled(Text, {
     color: '$gray10'
+});
+
+// Notification Panel Components
+export const NotificationPanel = styled(YStack, {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    width: 384,
+    backgroundColor: '$background',
+    borderLeftWidth: 1,
+    borderLeftColor: '$gray5',
+    zIndex: 1000,
+    overflow: 'hidden',
+    variants: {
+        open: {
+            true: {
+                opacity: 1,
+                transform: 'translateX(0)',
+            },
+            false: {
+                opacity: 0,
+                transform: 'translateX(384px)',
+            }
+        }
+    } as const,
+    defaultVariants: {
+        open: false
+    }
+});
+
+// Chat Components
+export const ChatPanel = styled(YStack, {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+    width: 384,
+    height: 600,
+    backgroundColor: '$background',
+    borderRadius: '$4',
+    shadowColor: '$shadowColor',
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.2,
+    overflow: 'hidden'
+});
+
+export const ChatHeader = styled(XStack, {
+    backgroundColor: '$color10',
+    padding: '$4',
+    borderTopLeftRadius: '$4',
+    borderTopRightRadius: '$4'
+});
+
+export const ChatInput = styled(YStack, {
+    padding: '$4',
+    borderTopWidth: 1,
+    borderTopColor: '$gray5'
 });
 
 // Common interfaces
@@ -84,7 +142,6 @@ export interface FeaturesProps {
     setCurrentPage: (page: string) => void;
 }
 
-// New interfaces for additional components
 export interface Notification {
     id: number;
     type: 'success' | 'warning' | 'info';
@@ -96,19 +153,6 @@ export interface Notification {
 export interface NotificationSystemProps {
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
-}
-
-export interface AnalyticsData {
-    date: string;
-    viewers: number;
-    engagement: number;
-    duration: number;
-}
-
-export interface TopStream {
-    title: string;
-    viewers: number;
-    date: string;
 }
 
 export interface ChatMessage {
@@ -131,41 +175,15 @@ export interface IntegrationSetting {
     enabled: boolean;
 }
 
-// Styled components for new features
-export const NotificationPanel = styled(YStack, {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    width: 384,
-    backgroundColor: '$background',
-    borderLeftWidth: 1,
-    borderLeftColor: '$gray5'
-});
+export interface AnalyticsData {
+    date: string;
+    viewers: number;
+    engagement: number;
+    duration: number;
+}
 
-export const ChatPanel = styled(YStack, {
-    position: 'absolute',
-    bottom: 16,
-    right: 16,
-    width: 384,
-    height: 600,
-    backgroundColor: '$background',
-    borderRadius: '$4',
-    shadowColor: '$shadowColor',
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.2
-});
-
-export const ChatHeader = styled(XStack, {
-    backgroundColor: '$color10',
-    padding: '$4',
-    borderTopLeftRadius: '$4',
-    borderTopRightRadius: '$4'
-});
-
-export const ChatInput = styled(YStack, {
-    padding: '$4',
-    borderTopWidth: 1,
-    borderTopColor: '$gray5'
-});
+export interface TopStream {
+    title: string;
+    viewers: number;
+    date: string;
+}

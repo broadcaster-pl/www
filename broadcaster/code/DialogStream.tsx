@@ -12,7 +12,8 @@ import {
     AdvancedAnalytics,
     ChatSupport,
     Integrations,
-    NavItem
+    NavItem,
+    ClientOnly
 } from './components';
 import navigationData from '../data/navigation.json';
 
@@ -25,21 +26,21 @@ export function DialogStream(): JSX.Element {
     const renderPage = (): JSX.Element => {
         switch(currentPage) {
             case 'features':
-                return <Features setCurrentPage={setCurrentPage} />;
+                return <ClientOnly><Features setCurrentPage={setCurrentPage} /></ClientOnly>;
             case 'client':
-                return <ClientPanel />;
+                return <ClientOnly><ClientPanel /></ClientOnly>;
             case 'api':
-                return <ApiDocumentation />;
+                return <ClientOnly><ApiDocumentation /></ClientOnly>;
             case 'blog':
-                return <Blog />;
+                return <ClientOnly><Blog /></ClientOnly>;
             case 'status':
-                return <Status />;
+                return <ClientOnly><Status /></ClientOnly>;
             case 'payment':
-                return <PaymentSystem />;
+                return <ClientOnly><PaymentSystem /></ClientOnly>;
             case 'analytics':
-                return <AdvancedAnalytics />;
+                return <ClientOnly><AdvancedAnalytics /></ClientOnly>;
             case 'integrations':
-                return <Integrations />;
+                return <ClientOnly><Integrations /></ClientOnly>;
             default:
                 return (
                     <YStack f={1} pt="$8">
@@ -142,41 +143,43 @@ export function DialogStream(): JSX.Element {
             </XStack>
 
             {/* Mobile Navigation Sheet */}
-            <Sheet
-                modal
-                open={isMenuOpen}
-                onOpenChange={setIsMenuOpen}
-                snapPoints={[90]}
-                position={0}
-                dismissOnSnapToBottom
-            >
-                <Sheet.Frame>
-                    <Sheet.Handle />
-                    <YStack p="$4" space="$4">
-                        {navigationData.navItems.map((item: NavItem) => (
-                            <Button
-                                key={item.key}
+            <ClientOnly>
+                <Sheet
+                    modal
+                    open={isMenuOpen}
+                    onOpenChange={setIsMenuOpen}
+                    snapPoints={[90]}
+                    position={0}
+                    dismissOnSnapToBottom
+                >
+                    <Sheet.Frame>
+                        <Sheet.Handle />
+                        <YStack p="$4" space="$4">
+                            {navigationData.navItems.map((item: NavItem) => (
+                                <Button
+                                    key={item.key}
+                                    onPress={() => {
+                                        setCurrentPage(item.key);
+                                        setIsMenuOpen(false);
+                                    }}
+                                    theme={currentPage === item.key ? 'yellow' : undefined}
+                                >
+                                    {item.name}
+                                </Button>
+                            ))}
+                            <Button 
+                                theme="yellow"
                                 onPress={() => {
-                                    setCurrentPage(item.key);
+                                    setCurrentPage('payment');
                                     setIsMenuOpen(false);
                                 }}
-                                theme={currentPage === item.key ? 'yellow' : undefined}
                             >
-                                {item.name}
+                                Rozpocznij
                             </Button>
-                        ))}
-                        <Button 
-                            theme="yellow"
-                            onPress={() => {
-                                setCurrentPage('payment');
-                                setIsMenuOpen(false);
-                            }}
-                        >
-                            Rozpocznij
-                        </Button>
-                    </YStack>
-                </Sheet.Frame>
-            </Sheet>
+                        </YStack>
+                    </Sheet.Frame>
+                </Sheet>
+            </ClientOnly>
 
             {/* Main Content */}
             {renderPage()}
@@ -233,13 +236,17 @@ export function DialogStream(): JSX.Element {
             </XStack>
 
             {/* Notifications Panel */}
-            <NotificationSystem 
-                isOpen={isNotificationsOpen} 
-                setIsOpen={setIsNotificationsOpen} 
-            />
+            <ClientOnly>
+                <NotificationSystem 
+                    isOpen={isNotificationsOpen} 
+                    setIsOpen={setIsNotificationsOpen} 
+                />
+            </ClientOnly>
 
             {/* Chat Support */}
-            {isChatOpen && <ChatSupport />}
+            <ClientOnly>
+                {isChatOpen && <ChatSupport />}
+            </ClientOnly>
 
             {/* Chat Support Toggle */}
             <Button
