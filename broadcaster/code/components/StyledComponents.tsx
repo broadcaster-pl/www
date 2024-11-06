@@ -52,12 +52,45 @@ export const NotificationPanel = styled(YStack, {
 });
 
 // Chat Components
+export const ChatContainer = styled(YStack, {
+    backgroundColor: 'transparent',
+    zIndex: 1000,
+    variants: {
+        layout: {
+            docked: {
+                position: 'absolute',
+                top: 0,
+                left: '50%',
+                transform: [
+                    { translateX: '-50%' }
+                ]
+            },
+            center: {
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: [
+                    { translateX: '-50%' },
+                    { translateY: '-50%' }
+                ]
+            }
+        },
+        size: {
+            expanded: {
+                scale: 1,
+            },
+            minimized: {
+                scale: 0.8,
+            }
+        }
+    } as const,
+    defaultVariants: {
+        layout: 'center',
+        size: 'expanded'
+    }
+});
+
 export const ChatPanel = styled(YStack, {
-    position: 'absolute',
-    bottom: 16,
-    right: 16,
-    width: 384,
-    height: 600,
     backgroundColor: '$background',
     borderRadius: '$4',
     shadowColor: '$shadowColor',

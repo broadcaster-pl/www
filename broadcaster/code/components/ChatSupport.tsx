@@ -1,173 +1,315 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { YStack, XStack, Text, Button, Input, Theme, ScrollView, GetRef } from 'tamagui';
-import { X, Send } from '@tamagui/lucide-icons';
-import { ChatPanel, ChatHeader, ChatInput, ChatMessage } from './StyledComponents';
+import React, { useEffect, useRef, useState } from 'react';
+import { YStack, XStack, Text, Button, Input, ScrollView, GetRef, Stack } from 'tamagui';
+import { X, Send, Search, MessageCircle } from '@tamagui/lucide-icons';
+import { ChatContainer, ChatPanel, ChatMessage } from './StyledComponents';
 import { ClientOnly } from './ClientOnly';
+import { searchService } from '../services/SearchService';
 
-const initialMessages: ChatMessage[] = [
-    {
-        id: 1,
-        type: 'system',
-        content: 'Witaj w DialogStream Support. Jak możemy Ci pomóc?',
-        time: '10:00'
-    },
-    {
-        id: 2,
-        type: 'user',
-        content: 'Mam problem z konfiguracją streamu',
-        time: '10:01'
-    },
-    {
-        id: 3,
-        type: 'agent',
-        content: 'Dzień dobry! Z przyjemnością pomogę. Który element konfiguracji sprawia problem?',
-        time: '10:02'
-    }
-];
+const MINIMIZE_DELAY = 15000; // 15 seconds
 
 const ChatSupportContent: React.FC = (): JSX.Element => {
-    const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
-    const [newMessage, setNewMessage] = useState('');
-    const [isOpen, setIsOpen] = useState(true);
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [inputValue, setInputValue] = useState('');
+    const [isExpanded, setIsExpanded] = useState(true);
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
+    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const inputRef = useRef<GetRef<typeof Input>>(null);
     const scrollViewRef = useRef<GetRef<typeof ScrollView>>(null);
+    const minimizeTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const chatContainerRef = useRef<GetRef<typeof YStack>>(null);
+    const [isDocked, setIsDocked] = useState(false);
 
     const scrollToBottom = () => {
-        if (scrollViewRef.current) {
-            requestAnimationFrame(() => {
-                scrollViewRef.current?.scrollToEnd({ animated: true });
-            });
+        setTimeout(() => {
+            if (scrollViewRef.current) {
+                const scrollView = scrollViewRef.current as any;
+                scrollView.scrollToEnd?.({ animated: true });
+            }
+        }, 100); // Small delay to ensure content is rendered
+    };
+
+    // Handle clicks outside chat
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (chatContainerRef.current && 
+                !(chatContainerRef.current as any).contains(event.target as Node)) {
+                setIsExpanded(false);
+                setIsDocked(true);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    // Scroll to bottom whenever messages change
+    useEffect(() => {
+        if (messages.length > 0) {
+            scrollToBottom();
+        }
+    }, [messages]);
+
+    // Scroll to bottom when chat expands
+    useEffect(() => {
+        if (isExpanded && messages.length > 0) {
+            scrollToBottom();
+        }
+    }, [isExpanded]);
+
+    const resetMinimizeTimer = () => {
+        if (minimizeTimerRef.current) {
+            clearTimeout(minimizeTimerRef.current);
+        }
+        if (inputValue.length === 0) {
+            minimizeTimerRef.current = setTimeout(() => {
+                setIsExpanded(false);
+                setIsDocked(true);
+            }, MINIMIZE_DELAY);
         }
     };
 
     useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
+        if (isInitialLoad) {
+            setIsInitialLoad(false);
+            setTimeout(() => {
+                setIsDocked(true);
+                setIsExpanded(false);
+            }, MINIMIZE_DELAY);
+        }
+    }, [isInitialLoad]);
+
+    useEffect(() => {
+        const handleKeyPress = (e: KeyboardEvent) => {
+            if (e.key === 'Enter' && !e.shiftKey && document.activeElement !== inputRef.current) {
+                inputRef.current?.focus();
+            }
+        };
+
+        window.addEventListener('keypress', handleKeyPress);
+        return () => window.removeEventListener('keypress', handleKeyPress);
+    }, []);
+
+    useEffect(() => {
+        const fetchResults = async () => {
+            if (inputValue.trim()) {
+                const results = await searchService.search(inputValue);
+                setSearchResults(results);
+            } else {
+                setSearchResults([]);
+            }
+        };
+
+        fetchResults();
+    }, [inputValue]);
+
+    const handleInputFocus = () => {
+        setIsExpanded(true);
+        setIsDocked(false);
+        resetMinimizeTimer();
+        if (messages.length > 0) {
+            scrollToBottom();
+        }
+    };
+
+    const handleInputChange = (value: string) => {
+        setInputValue(value);
+        if (value.length > 0) {
+            setIsExpanded(true);
+            setIsDocked(false);
+        }
+        resetMinimizeTimer();
+    };
 
     const sendMessage = () => {
-        if (newMessage.trim()) {
-            const currentTime = new Date().toLocaleTimeString('pl-PL', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            });
+        if (inputValue.trim()) {
+            const newMessage: ChatMessage = {
+                id: messages.length + 1,
+                type: 'user',
+                content: inputValue,
+                time: new Date().toLocaleTimeString('pl-PL', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                })
+            };
 
-            setMessages([
-                ...messages,
-                {
-                    id: messages.length + 1,
-                    type: 'user',
-                    content: newMessage,
-                    time: currentTime
-                }
-            ]);
-            setNewMessage('');
-
-            // Simulate agent response
+            setMessages(prev => [...prev, newMessage]);
+            setInputValue('');
+            resetMinimizeTimer();
+            
+            // Focus back on input after sending
             setTimeout(() => {
-                setMessages(prev => [
-                    ...prev,
-                    {
-                        id: prev.length + 1,
-                        type: 'agent',
-                        content: 'Dziękuję za wiadomość. Nasz konsultant odpowie najszybciej jak to możliwe.',
-                        time: new Date().toLocaleTimeString('pl-PL', { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
-                        })
-                    }
-                ]);
+                inputRef.current?.focus();
+            }, 0);
+
+            // Simulate response
+            setTimeout(() => {
+                const responseMessage: ChatMessage = {
+                    id: messages.length + 2,
+                    type: 'agent',
+                    content: 'Dziękuję za wiadomość. Jak mogę pomóc?',
+                    time: new Date().toLocaleTimeString('pl-PL', { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    })
+                };
+                setMessages(prev => [...prev, responseMessage]);
+                // Ensure input stays focused after response
+                inputRef.current?.focus();
             }, 1000);
         }
     };
 
-    const getMessageStyle = (type: ChatMessage['type']) => {
-        switch (type) {
-            case 'user':
-                return {
-                    backgroundColor: '$blue10',
-                    color: 'white',
-                    alignSelf: 'flex-end' as const
-                };
-            case 'agent':
-                return {
-                    backgroundColor: '$gray2',
-                    alignSelf: 'flex-start' as const
-                };
-            case 'system':
-                return {
-                    backgroundColor: '$gray1',
-                    alignSelf: 'center' as const
-                };
-        }
-    };
-
-    if (!isOpen) {
-        return <YStack />;
-    }
-
     return (
-        <ChatPanel>
-            {/* Header */}
-            <ChatHeader>
-                <YStack f={1}>
-                    <Text color="white" fontWeight="bold">Wsparcie techniczne</Text>
-                    <Text color="white" o={0.8} fontSize="$2">Online</Text>
-                </YStack>
-                <Button
-                    chromeless
-                    onPress={() => setIsOpen(false)}
-                    icon={<X size="$1" color="white" />}
-                />
-            </ChatHeader>
-
-            {/* Messages */}
-            <ScrollView 
-                f={1} 
-                p="$4" 
-                space="$4" 
-                ref={scrollViewRef}
-                bounces={false}
-                showsVerticalScrollIndicator={false}
-            >
-                {messages.map((message) => (
-                    <YStack
-                        key={message.id}
-                        maxWidth="80%"
-                        p="$3"
-                        br="$4"
-                        mb="$2"
-                        {...getMessageStyle(message.type)}
-                    >
-                        <Text>{message.content}</Text>
-                        <Text fontSize="$1" o={0.7} mt="$1">
-                            {message.time}
-                        </Text>
-                    </YStack>
-                ))}
-            </ScrollView>
-
-            {/* Input */}
-            <ChatInput>
-                <XStack space="$2">
+        <YStack
+            ref={chatContainerRef}
+            animation="quick"
+            position="absolute"
+            {...(isDocked ? {
+                top: 0,
+                left: "50%",
+                transform: [{ translateX: '-50%' }]
+            } : {
+                top: "50%",
+                left: "50%",
+                transform: [{ translateX: '-50%' }, { translateY: '-50%' }]
+            })}
+            width={isExpanded ? 600 : 400}
+            height={isExpanded ? 500 : 50}
+            scale={isExpanded ? 1 : 0.8}
+            zIndex={1000}
+        >
+            {!isExpanded ? (
+                <XStack
+                    p="$2"
+                    ai="center"
+                    jc="space-between"
+                    bg="$background"
+                    br="$4"
+                    shadowColor="$shadowColor"
+                    shadowRadius={20}
+                    shadowOffset={{ width: 0, height: 10 }}
+                    shadowOpacity={0.2}
+                >
                     <Input
+                        ref={inputRef}
                         f={1}
                         size="$4"
-                        value={newMessage}
-                        onChangeText={setNewMessage}
-                        placeholder="Napisz wiadomość..."
-                        enterKeyHint="send"
+                        value={inputValue}
+                        onChangeText={handleInputChange}
+                        placeholder="Szukaj lub rozpocznij czat..."
+                        onFocus={handleInputFocus}
+                        borderWidth={0}
+                        bg="transparent"
+                        color="$color"
                         onSubmitEditing={sendMessage}
+                        returnKeyType="send"
                     />
-                    <Theme name="yellow">
-                        <Button
-                            size="$4"
-                            icon={<Send size="$1" />}
-                            onPress={sendMessage}
-                            disabled={!newMessage.trim()}
-                        />
-                    </Theme>
+                    <Button
+                        size="$3"
+                        chromeless
+                        icon={<Search size="$1" />}
+                        onPress={handleInputFocus}
+                    />
                 </XStack>
-            </ChatInput>
-        </ChatPanel>
+            ) : (
+                <YStack f={1} bg="$background" br="$4" ov="hidden">
+                    {searchResults.length > 0 && inputValue && !messages.length ? (
+                        <ScrollView f={1} p="$4">
+                            <YStack space="$2">
+                                {searchResults.map((result) => (
+                                    <XStack
+                                        key={result.id}
+                                        p="$3"
+                                        br="$2"
+                                        bg="$gray2"
+                                        pressStyle={{ bg: '$gray3' }}
+                                        onPress={() => setInputValue(result.title)}
+                                    >
+                                        <YStack f={1}>
+                                            <Text fontWeight="bold">{result.title}</Text>
+                                            {result.description && (
+                                                <Text color="$gray11" fontSize="$3">
+                                                    {result.description}
+                                                </Text>
+                                            )}
+                                        </YStack>
+                                    </XStack>
+                                ))}
+                            </YStack>
+                        </ScrollView>
+                    ) : (
+                        <YStack f={1}>
+                            <ScrollView
+                                f={1}
+                                p="$4"
+                                ref={scrollViewRef}
+                                showsVerticalScrollIndicator={false}
+                            >
+                                <YStack space="$4">
+                                    {messages.map((message) => (
+                                        <XStack
+                                            key={message.id}
+                                            jc={message.type === 'user' ? 'flex-end' : 'flex-start'}
+                                        >
+                                            <YStack
+                                                maxWidth="80%"
+                                                p="$3"
+                                                br="$4"
+                                                bg={message.type === 'user' ? '$blue10' : '$gray2'}
+                                            >
+                                                <Text color={message.type === 'user' ? 'white' : '$color'}>
+                                                    {message.content}
+                                                </Text>
+                                                <Text
+                                                    fontSize="$1"
+                                                    color={message.type === 'user' ? 'white' : '$gray11'}
+                                                    o={0.7}
+                                                    mt="$1"
+                                                >
+                                                    {message.time}
+                                                </Text>
+                                            </YStack>
+                                        </XStack>
+                                    ))}
+                                </YStack>
+                            </ScrollView>
+                            <XStack
+                                p="$2"
+                                ai="center"
+                                jc="space-between"
+                                bg="$color10"
+                                borderTopLeftRadius="$4"
+                                borderTopRightRadius="$4"
+                            >
+                                <Input
+                                    ref={inputRef}
+                                    f={1}
+                                    size="$4"
+                                    value={inputValue}
+                                    onChangeText={handleInputChange}
+                                    placeholder="Napisz wiadomość..."
+                                    onFocus={handleInputFocus}
+                                    borderWidth={0}
+                                    bg="transparent"
+                                    color="white"
+                                    onSubmitEditing={sendMessage}
+                                    returnKeyType="send"
+                                />
+                                <Button
+                                    size="$3"
+                                    chromeless
+                                    icon={<Send size="$1" color="white" />}
+                                    onPress={sendMessage}
+                                    disabled={!inputValue.trim()}
+                                />
+                            </XStack>
+                        </YStack>
+                    )}
+                </YStack>
+            )}
+        </YStack>
     );
 };
 

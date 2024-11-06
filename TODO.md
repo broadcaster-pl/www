@@ -8,11 +8,31 @@ i poszerzać do chata jeśli jest coś w nim pisane i minimalizować się do pol
 Gdy jest używana klawiatura to po naciśnięciu [enter], kursor pisane, to automatycznie kursor powinien pojawiac się w polu chat/wyszukiwania 
 Stwórz backend do chata/wyszukiwania, aby działo to szybko w oparciu o każde naciśnięcie klawisza pojawiały się podpoowiedzi
 
+chat po kliknieciu enter powinien wysyłać wiadomośc tak jak po kliknięciu buttona
+Pole wpisywania wiadomości powinno być na dole a nie na górze chat
+
+po kliknięciu [enter] kursor powinien znaleźć się ponownie w polu wpisywania chat
+po wpisaniu wiadomości, zawartość powinna się scrollować do najnowszej
+przy kliknięciu w menu chat powinien opwrócić do pozycji zminimalizowanej 
+
+przy kliknięciu w chat powinnien zescrolować wiadomośći do najnowszej
+
+wyłacz chowanie chatu po czasie (15 sekundach)
+
+napisz tekst zachęty aby użytkownik, wiedział, że to nie jest zwykłe pole wysuzkiwania, ale też chatbot, który odpowiada, oraz pisze, np, 
+- zostaw swój numer telefonu, oddzwonimy,
+- podaj swój email, wyślemy email z kodem do logowania/rejestracji (jeśli email nie istnieje) stworz backend do tego
+- podaj więcej przykładów użycia, gdzie klient, będzie miał informacje od razu bez wertowania strony, podaj liste ostatnio wybieranych opcji z chata, 
+aby użytkownik, nie musiał pisać, jeśli tylko kliknie na pole szukaj/chat-a 
+
+
+
 
 Panel klienta powinien być dostepny po zalogowaniu
 
-Dodaj podstrone RODO 
 Dodaj podstrone 
+
+klikalne logo / napis pokazujacy strone
 
 
 
