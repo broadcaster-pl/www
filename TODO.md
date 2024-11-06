@@ -35,9 +35,8 @@ przesun tresc strony z tytułem ponizej chat, aktualnie tytuły stron są zasło
 
 zrob refaktoryzacje chat i podziel na kilka plikow
 
-zoptymalizuj chat, dodaj go jako stałą część strony na dole pod menu, aby zajmował 30 procent strony od góry a następnie zaczynała się tresć strony
-w przypadku scrolowania powinien dać sie zescrolować jak zwyczajne pole szukaj
-
+zoptymalizuj chat, zmien do zwyczajnego pole szukaj, dodaj go jako stałą część strony na dole pod menu, aby zajmował 30 procent strony od góry a następnie zaczynała się tresć strony
+w przypadku scrolowania powinien dać sie zescrolować 
 
 napisz tekst zachęty aby użytkownik, wiedział, że to nie jest zwykłe pole wysuzkiwania, ale też chatbot, który odpowiada, oraz pisze, np, 
 - zostaw swój numer telefonu, oddzwonimy,

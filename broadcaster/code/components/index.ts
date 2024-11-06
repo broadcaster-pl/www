@@ -7,6 +7,6 @@ export * from './Status';
 export * from './StyledComponents';
 export * from './NotificationSystem';
 export * from './AdvancedAnalytics';
-export * from './ChatSupport';
+export { ChatSupport } from './chat';
 export * from './Integrations';
 export * from './ClientOnly';
