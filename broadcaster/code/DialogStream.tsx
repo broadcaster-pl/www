@@ -1,7 +1,86 @@
 import React, { useState } from 'react';
-import { YStack, XStack, Text, Button, Card, Stack, Input, Select, TextArea, Sheet } from 'tamagui';
-import { Check, Zap, Shield, Cloud, Video, Share2, Star, Fingerprint, Box, Tv, Menu, X } from '@tamagui/lucide-icons';
+import {
+    YStack,
+    XStack,
+    Text,
+    Button,
+    Card,
+    Stack,
+    Input,
+    Select,
+    TextArea,
+    Sheet,
+    styled,
+    GetProps,
+    YStackProps,
+    TextProps
+} from 'tamagui';
+import {
+    Check,
+    Zap,
+    Shield,
+    Cloud,
+    Video,
+    Share2,
+    Star,
+    Fingerprint,
+    Box,
+    Tv,
+    Menu,
+    X
+} from '@tamagui/lucide-icons';
 
+
+interface Endpoint {
+    method: string;
+    endpoint: string;
+    description: string;
+    parameters: Array<{
+        name: string;
+        type: string;
+        description: string;
+    }>;
+    example: string;
+}
+
+interface StreamStats {
+    totalViews: string;
+    activeStreams: string;
+    storageUsed: string;
+    bandwidth: string;
+}
+
+interface RecentStream {
+    id: number;
+    title: string;
+    viewers: number;
+    duration: string;
+    date: string;
+}
+
+// Create styled components for consistent styling
+const CodeBlock = styled(YStack, {
+    backgroundColor: '$gray5',
+    padding: '$2',
+    borderRadius: '$2'
+});
+
+const SectionTitle = styled(Text, {
+    fontSize: '$8',
+    fontWeight: 'bold',
+    textAlign: 'center'
+});
+
+const CardTitle = styled(Text, {
+    fontSize: '$6',
+    fontWeight: 'bold'
+});
+
+const CardDescription = styled(Text, {
+    color: '$gray10'
+});
+
+// Type definitions
 interface NavItem {
     name: string;
     key: string;
@@ -18,7 +97,6 @@ interface FooterSection {
 interface FeaturesProps {
     setCurrentPage: (page: string) => void;
 }
-
 interface FAQ {
     question: string;
     answer: string;
@@ -37,6 +115,331 @@ interface Service {
     status: string;
     uptime: string;
 }
+
+// Payment System Component
+const PaymentSystem: React.FC = () => {
+    const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+    const [paymentMethod, setPaymentMethod] = useState('card');
+
+    const paymentMethods = [
+        { id: 'card', name: 'Karta płatnicza' },
+        { id: 'blik', name: 'BLIK' },
+        { id: 'transfer', name: 'Przelew bankowy' }
+    ];
+
+    return (
+        <YStack f={1} pt="$8">
+            <YStack ai="center" p="$4" space="$4">
+                <Text fontSize="$8" fontWeight="bold">Płatność</Text>
+                <YStack maw={600} space="$4" f={1}>
+                    <Card elevate size="$4" p="$4">
+                        <YStack space="$4">
+                            <Text fontSize="$6" fontWeight="bold">Wybierz plan</Text>
+                            <YStack space="$2">
+                                {['Pro', 'Business'].map((plan) => (
+                                    <XStack
+                                        key={plan}
+                                        p="$4"
+                                        br="$4"
+                                        borderWidth={1}
+                                        borderColor={selectedPlan === plan ? '$color10' : '$gray5'}
+                                        bg={selectedPlan === plan ? '$gray1' : 'transparent'}
+                                        pressStyle={{ scale: 0.98 }}
+                                        onPress={() => setSelectedPlan(plan)}
+                                    >
+                                        <YStack f={1}>
+                                            <Text fontWeight="bold">{plan}</Text>
+                                            <Text color="$gray10">
+                                                {plan === 'Pro' ? '149 PLN / miesiąc' : '299 PLN / miesiąc'}
+                                            </Text>
+                                        </YStack>
+                                        <YStack
+                                            w={16}
+                                            h={16}
+                                            br={100}
+                                            borderWidth={2}
+                                            borderColor={selectedPlan === plan ? '$color10' : '$gray5'}
+                                            bg={selectedPlan === plan ? '$color10' : 'transparent'}
+                                        />
+                                    </XStack>
+                                ))}
+                            </YStack>
+                        </YStack>
+                    </Card>
+
+                    <Card elevate size="$4" p="$4">
+                        <YStack space="$4">
+                            <Text fontSize="$6" fontWeight="bold">Metoda płatności</Text>
+                            <YStack space="$2">
+                                {paymentMethods.map((method) => (
+                                    <XStack
+                                        key={method.id}
+                                        p="$4"
+                                        br="$4"
+                                        borderWidth={1}
+                                        borderColor={paymentMethod === method.id ? '$color10' : '$gray5'}
+                                        bg={paymentMethod === method.id ? '$gray1' : 'transparent'}
+                                        pressStyle={{ scale: 0.98 }}
+                                        onPress={() => setPaymentMethod(method.id)}
+                                    >
+                                        <Text fontWeight="bold" f={1}>{method.name}</Text>
+                                        <YStack
+                                            w={16}
+                                            h={16}
+                                            br={100}
+                                            borderWidth={2}
+                                            borderColor={paymentMethod === method.id ? '$color10' : '$gray5'}
+                                            bg={paymentMethod === method.id ? '$color10' : 'transparent'}
+                                        />
+                                    </XStack>
+                                ))}
+                            </YStack>
+                        </YStack>
+                    </Card>
+
+                    <Card elevate size="$4" p="$4">
+                        <YStack space="$4">
+                            <Text fontSize="$6" fontWeight="bold">Podsumowanie</Text>
+                            <YStack space="$2">
+                                <XStack jc="space-between">
+                                    <Text>Plan {selectedPlan || '-'}</Text>
+                                    <Text>
+                                        {selectedPlan === 'Pro' ? '149 PLN' :
+                                            selectedPlan === 'Business' ? '299 PLN' : '-'}
+                                    </Text>
+                                </XStack>
+                                <XStack jc="space-between">
+                                    <Text color="$gray10">VAT (23%)</Text>
+                                    <Text color="$gray10">
+                                        {selectedPlan === 'Pro' ? '34,27 PLN' :
+                                            selectedPlan === 'Business' ? '68,77 PLN' : '-'}
+                                    </Text>
+                                </XStack>
+                                <YStack borderTopWidth={1} borderColor="$gray5" mt="$2" pt="$2">
+                                    <XStack jc="space-between">
+                                        <Text fontWeight="bold">Razem</Text>
+                                        <Text fontWeight="bold">
+                                            {selectedPlan === 'Pro' ? '183,27 PLN' :
+                                                selectedPlan === 'Business' ? '367,77 PLN' : '-'}
+                                        </Text>
+                                    </XStack>
+                                </YStack>
+                            </YStack>
+                        </YStack>
+                    </Card>
+
+                    <Button
+                        theme="yellow"
+                        disabled={!selectedPlan}
+                        opacity={selectedPlan ? 1 : 0.5}
+                    >
+                        Zapłać i aktywuj
+                    </Button>
+                </YStack>
+            </YStack>
+        </YStack>
+    );
+};
+
+
+
+
+// API Documentation Component
+const APIDocumentation: React.FC = () => {
+    const endpoints: Endpoint[] = [
+        {
+            method: 'GET',
+            endpoint: '/api/v1/streams',
+            description: 'Lista aktywnych streamów',
+            parameters: [
+                { name: 'limit', type: 'number', description: 'Limit wyników (default: 10)' },
+                { name: 'offset', type: 'number', description: 'Offset wyników (default: 0)' }
+            ],
+            example: `{
+  "streams": [
+    {
+      "id": "stream_123",
+      "title": "My Stream",
+      "status": "live",
+      "viewers": 150,
+      "started_at": "2024-03-15T10:00:00Z"
+    }
+  ],
+  "total": 1
+}`
+        },
+        {
+            method: 'POST',
+            endpoint: '/api/v1/streams/create',
+            description: 'Utworzenie nowego streamu',
+            parameters: [
+                { name: 'title', type: 'string', description: 'Tytuł streamu' },
+                { name: 'description', type: 'string', description: 'Opis streamu (opcjonalny)' }
+            ],
+            example: `{
+  "stream_key": "abc123xyz",
+  "rtmp_url": "rtmp://stream.dialogstream.com/live",
+  "playback_url": "https://stream.dialogstream.com/watch/abc123xyz"
+}`
+        }
+    ];
+
+    return (
+        <YStack f={1} pt="$8">
+            <YStack ai="center" p="$4" space="$4">
+                <Text fontSize="$8" fontWeight="bold">Dokumentacja API</Text>
+                <YStack maw={800} space="$4">
+                    <Card elevate size="$4" p="$4">
+                        <YStack space="$2">
+                            <Text fontSize="$6" fontWeight="bold">Uwierzytelnianie</Text>
+                            <Text color="$gray10">
+                                Wszystkie zapytania do API wymagają tokenu uwierzytelniającego w headerze:
+                            </Text>
+                            <YStack bg="$gray5" p="$2" br="$2">
+                                <Text fontFamily="$mono">Authorization: Bearer YOUR_API_KEY</Text>
+                            </YStack>
+                        </YStack>
+                    </Card>
+
+                    {endpoints.map((endpoint, index) => (
+                        <Card key={index} elevate size="$4" p="$4">
+                            <YStack space="$4">
+                                <XStack space="$2" ai="center">
+                                    <Text
+                                        bg={endpoint.method === 'GET' ? '$blue10' : '$green10'}
+                                        color="white"
+                                        px="$2"
+                                        py="$1"
+                                        br="$2"
+                                    >
+                                        {endpoint.method}
+                                    </Text>
+                                    <Text fontFamily="$mono">{endpoint.endpoint}</Text>
+                                </XStack>
+                                <Text color="$gray10">{endpoint.description}</Text>
+
+                                <YStack space="$2">
+                                    <Text fontWeight="bold">Parametry:</Text>
+                                    <XStack flexWrap="wrap" space="$4">
+                                        <YStack w="30%" space="$2">
+                                            <Text fontWeight="bold">Nazwa</Text>
+                                            {endpoint.parameters.map((param, pIndex) => (
+                                                <Text key={pIndex}>{param.name}</Text>
+                                            ))}
+                                        </YStack>
+                                        <YStack w="20%" space="$2">
+                                            <Text fontWeight="bold">Typ</Text>
+                                            {endpoint.parameters.map((param, pIndex) => (
+                                                <Text key={pIndex}>{param.type}</Text>
+                                            ))}
+                                        </YStack>
+                                        <YStack f={1} space="$2">
+                                            <Text fontWeight="bold">Opis</Text>
+                                            {endpoint.parameters.map((param, pIndex) => (
+                                                <Text key={pIndex}>{param.description}</Text>
+                                            ))}
+                                        </YStack>
+                                    </XStack>
+                                </YStack>
+
+                                <YStack space="$2">
+                                    <Text fontWeight="bold">Przykładowa odpowiedź:</Text>
+                                    <YStack bg="$gray5" p="$4" br="$2">
+                                        <Text fontFamily="$mono" whiteSpace="pre">
+                                            {endpoint.example}
+                                        </Text>
+                                    </YStack>
+                                </YStack>
+                            </YStack>
+                        </Card>
+                    ))}
+                </YStack>
+            </YStack>
+        </YStack>
+    );
+};
+
+// Client Panel Component
+const ClientPanel: React.FC = () => {
+    const [activeTab, setActiveTab] = useState('dashboard');
+
+    const streamStats: StreamStats = {
+        totalViews: "15,234",
+        activeStreams: "3",
+        storageUsed: "45.3 GB",
+        bandwidth: "1.2 TB"
+    };
+
+    const recentStreams: RecentStream[] = [
+        { id: 1, title: "Weekend Stream", viewers: 234, duration: "2h 15m", date: "2024-03-15" },
+        { id: 2, title: "Tutorial Session", viewers: 567, duration: "1h 45m", date: "2024-03-14" },
+        { id: 3, title: "Q&A Stream", viewers: 890, duration: "3h 30m", date: "2024-03-13" }
+    ];
+
+    return (
+        <YStack f={1} pt="$8">
+            <YStack p="$4" space="$4">
+                <XStack jc="space-between" ai="center">
+                    <Text fontSize="$7" fontWeight="bold">Panel klienta</Text>
+                    <Button theme="yellow">Nowy stream</Button>
+                </XStack>
+
+                <XStack space="$2">
+                    {['dashboard', 'streams', 'analytics', 'settings'].map((tab) => (
+                        <Button
+                            key={tab}
+                            theme={activeTab === tab ? "yellow" : undefined}
+                            onPress={() => setActiveTab(tab)}
+                        >
+                            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                        </Button>
+                    ))}
+                </XStack>
+
+                {activeTab === 'dashboard' && (
+                    <YStack space="$4">
+                        <XStack flexWrap="wrap" space="$4">
+                            {Object.entries(streamStats).map(([key, value]) => (
+                                <Card key={key} elevate size="$4" p="$4" w={200}>
+                                    <YStack>
+                                        <Text color="$gray10">
+                                            {key.replace(/([A-Z])/g, ' $1').trim()}
+                                        </Text>
+                                        <Text fontSize="$6" fontWeight="bold">{value}</Text>
+                                    </YStack>
+                                </Card>
+                            ))}
+                        </XStack>
+
+                        <Card elevate size="$4" p="$4">
+                            <YStack space="$4">
+                                <Text fontSize="$6" fontWeight="bold">Ostatnie streamy</Text>
+                                <YStack separator={<YStack h={1} bg="$gray5" />}>
+                                    {recentStreams.map((stream) => (
+                                        <XStack key={stream.id} py="$4" jc="space-between" ai="center">
+                                            <YStack>
+                                                <Text fontWeight="bold">{stream.title}</Text>
+                                                <Text color="$gray10">{stream.date}</Text>
+                                            </YStack>
+                                            <XStack space="$4" ai="center">
+                                                <Text color="$gray10">
+                                                    {stream.viewers} widzów • {stream.duration}
+                                                </Text>
+                                                <Button variant="outlined" size="$3">
+                                                    Szczegóły
+                                                </Button>
+                                            </XStack>
+                                        </XStack>
+                                    ))}
+                                </YStack>
+                            </YStack>
+                        </Card>
+                    </YStack>
+                )}
+            </YStack>
+        </YStack>
+    );
+};
 
 // Features Component
 const Features: React.FC<FeaturesProps> = ({ setCurrentPage }) => (
@@ -113,49 +516,52 @@ const Features: React.FC<FeaturesProps> = ({ setCurrentPage }) => (
 );
 
 // Contact Component
-const Contact: React.FC = () => (
-    <YStack f={1} pt="$8">
-        <YStack ai="center" p="$4" space="$4">
-            <Text fontSize="$8" fontWeight="bold">Kontakt</Text>
-            <Card elevate size="$4" p="$4" w={600}>
-                <YStack space="$4">
-                    <YStack space="$2">
-                        <Text fontWeight="bold">Imię i nazwisko</Text>
-                        <Input size="$4" />
+const Contact: React.FC = (): JSX.Element => {
+    // [Previous code remains the same]
+    return (
+        <YStack f={1} pt="$8">
+            <YStack ai="center" p="$4" space="$4">
+                <Text fontSize="$8" fontWeight="bold">Kontakt</Text>
+                <Card elevate size="$4" p="$4" w={600}>
+                    <YStack space="$4">
+                        <YStack space="$2">
+                            <Text fontWeight="bold">Imię i nazwisko</Text>
+                            <Input size="$4" />
+                        </YStack>
+                        <YStack space="$2">
+                            <Text fontWeight="bold">Email</Text>
+                            <Input size="$4" />
+                        </YStack>
+                        <YStack space="$2">
+                            <Text fontWeight="bold">Temat</Text>
+                            <Select size="$4">
+                                <Select.Trigger>
+                                    <Select.Value placeholder="Wybierz temat" />
+                                </Select.Trigger>
+                                <Select.Content>
+                                    <Select.Item index={0} value="general">
+                                        <Select.ItemText>Zapytanie ogólne</Select.ItemText>
+                                    </Select.Item>
+                                    <Select.Item index={1} value="support">
+                                        <Select.ItemText>Wsparcie techniczne</Select.ItemText>
+                                    </Select.Item>
+                                    <Select.Item index={2} value="business">
+                                        <Select.ItemText>Współpraca biznesowa</Select.ItemText>
+                                    </Select.Item>
+                                </Select.Content>
+                            </Select>
+                        </YStack>
+                        <YStack space="$2">
+                            <Text fontWeight="bold">Wiadomość</Text>
+                            <TextArea size="$4" h={120} />
+                        </YStack>
+                        <Button theme="yellow">Wyślij wiadomość</Button>
                     </YStack>
-                    <YStack space="$2">
-                        <Text fontWeight="bold">Email</Text>
-                        <Input size="$4" />
-                    </YStack>
-                    <YStack space="$2">
-                        <Text fontWeight="bold">Temat</Text>
-                        <Select size="$4">
-                            <Select.Trigger>
-                                <Select.Value placeholder="Wybierz temat" />
-                            </Select.Trigger>
-                            <Select.Content>
-                                <Select.Item index={0} value="general">
-                                    <Select.ItemText>Zapytanie ogólne</Select.ItemText>
-                                </Select.Item>
-                                <Select.Item index={1} value="support">
-                                    <Select.ItemText>Wsparcie techniczne</Select.ItemText>
-                                </Select.Item>
-                                <Select.Item index={2} value="business">
-                                    <Select.ItemText>Współpraca biznesowa</Select.ItemText>
-                                </Select.Item>
-                            </Select.Content>
-                        </Select>
-                    </YStack>
-                    <YStack space="$2">
-                        <Text fontWeight="bold">Wiadomość</Text>
-                        <TextArea size="$4" h={120} />
-                    </YStack>
-                    <Button theme="yellow">Wyślij wiadomość</Button>
-                </YStack>
-            </Card>
+                </Card>
+            </YStack>
         </YStack>
-    </YStack>
-);
+    );
+};
 
 // FAQ Component
 const FAQ: React.FC = () => {
@@ -301,7 +707,7 @@ const Status: React.FC = () => {
 };
 
 // Main DialogStream Component
-export function DialogStream() {
+export function DialogStream(): JSX.Element {
     const [currentPage, setCurrentPage] = useState('home');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -309,6 +715,8 @@ export function DialogStream() {
         { name: 'Strona główna', key: 'home' },
         { name: 'Funkcje', key: 'features' },
         { name: 'Cennik', key: 'pricing' },
+        { name: 'Panel klienta', key: 'client' },
+        { name: 'API', key: 'api' },
         { name: 'FAQ', key: 'faq' },
         { name: 'Blog', key: 'blog' },
         { name: 'Status', key: 'status' },
@@ -342,7 +750,7 @@ export function DialogStream() {
         }
     ];
 
-    const renderPage = () => {
+    const renderPage = (): JSX.Element => {
         switch(currentPage) {
             case 'features':
                 return <Features setCurrentPage={setCurrentPage} />;
@@ -354,6 +762,12 @@ export function DialogStream() {
                 return <Blog />;
             case 'status':
                 return <Status />;
+            case 'client':
+                return <ClientPanel />;
+            case 'api':
+                return <APIDocumentation />;
+            case 'payment':
+                return <PaymentSystem />;
             default:
                 return (
                     <YStack f={1} pt="$8">
