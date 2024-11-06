@@ -1,0 +1,62 @@
+{
+    "mainFeatures": [
+        {
+            "icon": "Video",
+            "title": "Streaming",
+            "desc": "Streaming w czasie rzeczywistym z wielu źródeł"
+        },
+        {
+            "icon": "Cloud",
+            "title": "Cloud Processing",
+            "desc": "Przetwarzanie w chmurze bez obciążania urządzenia"
+        },
+        {
+            "icon": "Share2",
+            "title": "Multi-Platform",
+            "desc": "Integracja z popularnymi platformami social media"
+        },
+        {
+            "icon": "Star",
+            "title": "AI Enhancement",
+            "desc": "Automatyczna optymalizacja contentu"
+        },
+        {
+            "icon": "Box",
+            "title": "Storage",
+            "desc": "Bezpieczne przechowywanie w chmurze"
+        },
+        {
+            "icon": "Tv",
+            "title": "Multi-channel",
+            "desc": "Zarządzanie wieloma kanałami"
+        }
+    ],
+    "previewFeatures": [
+        {
+            "icon": "Video",
+            "title": "Live Streaming"
+        },
+        {
+            "icon": "Cloud",
+            "title": "Cloud Processing"
+        },
+        {
+            "icon": "Star",
+            "title": "AI Enhancement"
+        }
+    ],
+    "benefits": [
+        {
+            "icon": "Fingerprint",
+            "text": "Unlimited projekty"
+        },
+        {
+            "icon": "Shield",
+            "text": "Gwarancja jakości"
+        },
+        {
+            "icon": "Zap",
+            "text": "Natychmiastowe przetwarzanie"
+        }
+    ]
+}

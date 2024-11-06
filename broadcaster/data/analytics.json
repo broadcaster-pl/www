@@ -1,0 +1,21 @@
+{
+    "dailyStats": [
+        { "date": "2024-03-10", "viewers": 1200, "engagement": 78, "duration": 125 },
+        { "date": "2024-03-11", "viewers": 1500, "engagement": 82, "duration": 145 },
+        { "date": "2024-03-12", "viewers": 1350, "engagement": 75, "duration": 115 },
+        { "date": "2024-03-13", "viewers": 1800, "engagement": 85, "duration": 160 },
+        { "date": "2024-03-14", "viewers": 1600, "engagement": 80, "duration": 140 },
+        { "date": "2024-03-15", "viewers": 2000, "engagement": 88, "duration": 180 },
+        { "date": "2024-03-16", "viewers": 1900, "engagement": 86, "duration": 170 }
+    ],
+    "topStreams": [
+        { "title": "Q&A Session", "viewers": 2000, "date": "2024-03-15" },
+        { "title": "Tutorial Stream", "viewers": 1900, "date": "2024-03-16" },
+        { "title": "Special Event", "viewers": 1800, "date": "2024-03-13" }
+    ],
+    "averages": {
+        "viewers": 1621,
+        "engagement": 82,
+        "duration": 148
+    }
+}

@@ -1,0 +1,25 @@
+{
+    "notifications": [
+        {
+            "id": 1,
+            "type": "success",
+            "title": "Stream rozpoczęty",
+            "message": "Twój stream \"Weekly Q&A\" został pomyślnie uruchomiony",
+            "time": "2 minuty temu"
+        },
+        {
+            "id": 2,
+            "type": "warning",
+            "title": "Wykorzystanie transferu",
+            "message": "Zbliżasz się do limitu transferu (85% wykorzystane)",
+            "time": "1 godzinę temu"
+        },
+        {
+            "id": 3,
+            "type": "info",
+            "title": "Nowa funkcja",
+            "message": "Dostępna nowa integracja z TikTok Live",
+            "time": "2 godziny temu"
+        }
+    ]
+}

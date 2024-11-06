@@ -1,0 +1,57 @@
+{
+    "endpoints": [
+        {
+            "method": "GET",
+            "endpoint": "/api/v1/streams",
+            "description": "Lista aktywnych streamów",
+            "parameters": [
+                { "name": "limit", "type": "number", "description": "Limit wyników (default: 10)" },
+                { "name": "offset", "type": "number", "description": "Offset wyników (default: 0)" }
+            ],
+            "example": {
+                "streams": [
+                    {
+                        "id": "stream_123",
+                        "title": "My Stream",
+                        "status": "live",
+                        "viewers": 150,
+                        "started_at": "2024-03-15T10:00:00Z"
+                    }
+                ],
+                "total": 1
+            }
+        },
+        {
+            "method": "POST",
+            "endpoint": "/api/v1/streams/create",
+            "description": "Utworzenie nowego streamu",
+            "parameters": [
+                { "name": "title", "type": "string", "description": "Tytuł streamu" },
+                { "name": "description", "type": "string", "description": "Opis streamu (opcjonalny)" }
+            ],
+            "example": {
+                "stream_key": "abc123xyz",
+                "rtmp_url": "rtmp://stream.dialogstream.com/live",
+                "playback_url": "https://stream.dialogstream.com/watch/abc123xyz"
+            }
+        }
+    ],
+    "faqs": [
+        {
+            "question": "Jak rozpocząć korzystanie z DialogStream?",
+            "answer": "Rozpoczęcie jest proste - wystarczy zarejestrować się i wybrać plan za 1 PLN na 7 dni. Otrzymasz pełny dostęp do wszystkich funkcji Pro."
+        },
+        {
+            "question": "Czy mogę zmienić plan w trakcie subskrypcji?",
+            "answer": "Tak, możesz w dowolnym momencie zmienić plan. Różnica w cenie zostanie proporcjonalnie rozliczona."
+        },
+        {
+            "question": "Jakie formaty plików są wspierane?",
+            "answer": "Wspieramy większość popularnych formatów wideo i audio, włączając MP4, AVI, MOV, MKV, MP3, WAV i więcej."
+        },
+        {
+            "question": "Czy oferujecie wsparcie techniczne?",
+            "answer": "Tak, zapewniamy wsparcie techniczne 24/7 dla wszystkich planów. Plan Business otrzymuje dodatkowo dedykowanego opiekuna."
+        }
+    ]
+}

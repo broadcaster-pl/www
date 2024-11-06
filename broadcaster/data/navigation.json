@@ -1,0 +1,36 @@
+{
+    "navItems": [
+        { "name": "Funkcje", "key": "features" },
+        { "name": "Cennik", "key": "pricing" },
+        { "name": "Panel klienta", "key": "client" },
+        { "name": "API", "key": "api" },
+        { "name": "FAQ", "key": "faq" },
+        { "name": "Blog", "key": "blog" }
+    ],
+    "footerSections": [
+        {
+            "title": "Produkt",
+            "items": [
+                { "name": "Funkcje", "key": "features" },
+                { "name": "Cennik", "key": "pricing" },
+                { "name": "FAQ", "key": "faq" }
+            ]
+        },
+        {
+            "title": "Wsparcie",
+            "items": [
+                { "name": "Dokumentacja", "key": "docs" },
+                { "name": "Kontakt", "key": "contact" },
+                { "name": "Status", "key": "status" }
+            ]
+        },
+        {
+            "title": "Firma",
+            "items": [
+                { "name": "O nas", "key": "about" },
+                { "name": "Blog", "key": "blog" },
+                { "name": "Kariera", "key": "careers" }
+            ]
+        }
+    ]
+}

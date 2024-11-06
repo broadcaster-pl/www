@@ -1,0 +1,85 @@
+{
+    "pricing": {
+        "plans": [
+            {
+                "name": "Pro",
+                "price": "149",
+                "highlight": "Najpopularniejszy wybór",
+                "features": [
+                    "Unlimited projekty",
+                    "100GB storage",
+                    "Priority support 24/7",
+                    "10 równoczesnych streamów",
+                    "Własne szablony",
+                    "Priority processing",
+                    "Backup w chmurze",
+                    "4K streaming"
+                ]
+            },
+            {
+                "name": "Business",
+                "price": "299",
+                "highlight": "Dla profesjonalistów",
+                "features": [
+                    "Unlimited projekty",
+                    "500GB storage",
+                    "Dedykowany opiekun 24/7",
+                    "Nielimitowane streamy",
+                    "API access",
+                    "White label",
+                    "Custom integracje",
+                    "SLA gwarantowane"
+                ]
+            }
+        ]
+    },
+    "blog": {
+        "posts": [
+            {
+                "title": "Jak zoptymalizować streaming pod SEO?",
+                "excerpt": "Poznaj najlepsze praktyki optymalizacji contentu streamingowego pod kątem wyszukiwarek.",
+                "author": "Anna Kowalska",
+                "date": "2024-03-15",
+                "readTime": "5 min"
+            },
+            {
+                "title": "Trendy w streamingu na rok 2024",
+                "excerpt": "Analiza najważniejszych trendów w branży streamingowej na nadchodzący rok.",
+                "author": "Jan Nowak",
+                "date": "2024-03-10",
+                "readTime": "8 min"
+            },
+            {
+                "title": "Jak zwiększyć zaangażowanie widzów?",
+                "excerpt": "Praktyczne wskazówki jak budować społeczność wokół swojego contentu.",
+                "author": "Marta Wiśniewska",
+                "date": "2024-03-05",
+                "readTime": "6 min"
+            }
+        ]
+    },
+    "status": {
+        "services": [
+            {
+                "name": "Streaming API",
+                "status": "operational",
+                "uptime": "99.99%"
+            },
+            {
+                "name": "Cloud Processing",
+                "status": "operational",
+                "uptime": "99.95%"
+            },
+            {
+                "name": "CDN",
+                "status": "operational",
+                "uptime": "100%"
+            },
+            {
+                "name": "Storage",
+                "status": "operational",
+                "uptime": "99.99%"
+            }
+        ]
+    }
+}

@@ -1,0 +1,45 @@
+{
+    "availableIntegrations": [
+        {
+            "name": "YouTube Live",
+            "icon": "🎥",
+            "status": "connected",
+            "description": "Streamuj bezpośrednio na YouTube"
+        },
+        {
+            "name": "Twitch",
+            "icon": "📺",
+            "status": "available",
+            "description": "Integracja z Twitch"
+        },
+        {
+            "name": "TikTok Live",
+            "icon": "📱",
+            "status": "available",
+            "description": "Streamuj na TikTok Live"
+        },
+        {
+            "name": "Facebook Live",
+            "icon": "📡",
+            "status": "connected",
+            "description": "Transmisje na Facebook Live"
+        }
+    ],
+    "settings": [
+        {
+            "name": "Auto-publikacja",
+            "description": "Automatycznie publikuj na połączonych platformach",
+            "enabled": true
+        },
+        {
+            "name": "Synchronizacja czatu",
+            "description": "Połącz czaty ze wszystkich platform",
+            "enabled": true
+        },
+        {
+            "name": "Powiadomienia",
+            "description": "Otrzymuj powiadomienia o aktywności",
+            "enabled": true
+        }
+    ]
+}
